@@ -30,7 +30,6 @@ public void OnPluginStart()
 	
 	LoadCFG();
 	LoadButtons();
-	HookEntityOutput("func_button", "OnUseLocked", ButtonPressed);
 	
 	HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy);
 	
@@ -71,7 +70,7 @@ void LoadButtons(){
 		}
 	}
 	
-		//Search for doors
+	//Search for func_door_rotating
 	while ((ent = FindEntityByClassname(ent, "func_door_rotating")) != -1) 
 	{
 		GetEntPropString(ent, Prop_Data, "m_iName", buffer, sizeof(buffer));
@@ -83,7 +82,7 @@ void LoadButtons(){
 	}
 	
 	ent = -1;
-	//Search for door_rotating
+	//Search for prop_door_rotating
 	while ((ent = FindEntityByClassname(ent, "prop_door_rotating")) != -1) 
 	{
 		GetEntPropString(ent, Prop_Data, "m_iName", buffer, sizeof(buffer));
@@ -151,15 +150,13 @@ public Action Timer_Button(Handle timer, int entity)
 public void OnRoundStart(Event event, const char[] name, bool dontBroadcast) 
 { 
     for (int i = 0; i < g_aButtons.Length; i++)
-    {
     	SetEntProp(g_aButtons.Get(i), Prop_Data, "m_bLocked", 1, 1);
-   	}
 }
 
 public Action OnPlayerRunCmd(int client, int &iButtons, int &iImpulse, float fVelocity[3], float fAngles[3], int &iWeapon, int &tickcount) {
 	static int iPlayerPrevButtons[MAXPLAYERS + 1];
-	if (IsClientInGame(client) && IsPlayerAlive(client)) {
-		if (!(iPlayerPrevButtons[client] & IN_USE) && iButtons & IN_USE) {
+	if (!(iPlayerPrevButtons[client] & IN_USE) && iButtons & IN_USE) {
+		if (IsClientInGame(client) && IsPlayerAlive(client)) {
 			int ent = GetClientAimTarget(client, false);
 			if (!IsValidEntity(ent)) {
 				iPlayerPrevButtons[client] = iButtons;
@@ -169,7 +166,7 @@ public Action OnPlayerRunCmd(int client, int &iButtons, int &iImpulse, float fVe
 				char itemName[128];
 				//GetEntPropString(ent, Prop_Data, "m_iName", itemName, sizeof(itemName));
 				GetEntityClassname(ent, itemName, sizeof(itemName));
-				if (StrContains(itemName, "door", false) != -1) {
+				if (StrContains(itemName, "door", false) != -1 || StrContains(itemName, "button", false) != -1) {
 					OnButtonPressed(client, ent);
 				}
 			}
