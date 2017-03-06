@@ -38,6 +38,8 @@ public void OnPluginStart()
 
 public Action Command_Reload(int client, int args){
 	ReplyToCommand(client, "Reloading buttons");
+	g_aButtonNames.Clear();
+	LoadCFG();
 	LoadButtons();
 	return Plugin_Handled;
 }
